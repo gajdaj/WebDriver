@@ -1,0 +1,77 @@
+import java.io.FileInputStream;
+
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class TestPOI {
+
+	private static String fileURL = "C:\\Book1.xlsx";
+	private static XSSFSheet ExcelSheet;
+	private static XSSFWorkbook ExcelBook;
+	private static XSSFCell ExcelCell;
+	private static XSSFRow ExcelRow;
+
+	public static void setPlikExcel(String fileURL, String SheetName) {
+		try {
+
+			FileInputStream ExcelFile = new FileInputStream(fileURL);
+			ExcelBook = new XSSFWorkbook(ExcelFile);
+			
+			ExcelSheet = ExcelBook.getSheet(SheetName);
+
+		} catch (Exception e) {
+			System.err.println("Wystapil blad przy otwieraniu pliku: " + e);
+		}
+	}
+
+	public static String getDataExcel(int rowNum,int ColNum){
+		try{
+		ExcelCell = ExcelSheet.getRow(rowNum).getCell(ColNum);
+		String daneKomorki = ExcelCell.getStringCellValue();
+		return daneKomorki;
+		}catch(Exception e){
+			System.err.println("Błąd: "+e);
+			return "";
+		}
+	}
+
+	public static void setDataExcel(String wartosc,int rowNum,int colNum){
+		ExcelRow = ExcelSheet.getRow(rowNum);
+		ExcelCell = ExcelRow.getCell(colNum,Row.RETURN_NULL_AND_BLANK);
+		if(ExcelCell==null){
+			ExcelCell = ExcelRow.createCell(colNum);
+			ExcelCell.setCellValue(wartosc);
+			try {
+				FileOutputStream fileOut = new FileOutputStream(fileURL);
+				ExcelBook.write(fileOut);
+				fileOut.flush();
+				fileOut.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		TestPOI.setPlikExcel(fileURL,"Sheet1");
+		String IDKlienta = TestPOI.getDataExcel(0, 1);
+		System.out.println(IDKlienta);
+		TestPOI.setPlikExcel(fileURL,"Sheet1");
+		TestPOI.setDataExcel("Taaaaaa", 2,7 );
+		System.out.println("Zapisane "+"Taaaaaa");
+	}
+
+}
